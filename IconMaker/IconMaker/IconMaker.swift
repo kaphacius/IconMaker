@@ -40,7 +40,24 @@ class IconMaker: NSObject {
     }
 
     func doMenuAction() {
-        //do stuff
+        if let oiu = getOriginalImageUrl() {
+            
+        }
+    }
+    
+    func getOriginalImageUrl() -> NSURL? {
+        var openPanel = NSOpenPanel()
+        openPanel.allowedFileTypes = ["png"]
+        openPanel.canChooseFiles = true
+        openPanel.canCreateDirectories = false
+        openPanel.allowsMultipleSelection = false
+        
+        var fileURL: NSURL? = nil
+        var result = openPanel.runModal()
+        if (NSFileHandlingPanelOKButton == result) {
+            fileURL = openPanel.URL
+        }
+        return fileURL
     }
 }
 
