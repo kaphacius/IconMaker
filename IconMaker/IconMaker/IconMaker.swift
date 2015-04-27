@@ -59,5 +59,25 @@ class IconMaker: NSObject {
         }
         return fileURL
     }
+    func getWorkspacePath() -> NSString? {
+        var workspacePath: NSString? = nil
+        var workspaceWindowControllers: AnyObject = NSClassFromString("IDEWorkspaceWindowController")
+        var controllers = workspaceWindowControllers.valueForKey("workspaceWindowControllers") as? NSArray
+        var workspace: AnyObject? = nil
+        if let c = controllers {
+            for controller in c {
+                var window: AnyObject? = controller.valueForKey("window")
+                var keyWindow = NSApp.keyWindow
+                if let w: AnyObject = window, let kw: AnyObject = keyWindow as? AnyObject {
+                    if true == w.isEqual(kw) {
+                        workspace = controller.valueForKey("_workspace")
+                        break
+                    }
+                }
+            }
+            workspacePath = workspace?.valueForKey("representingFilePath")?.valueForKey("_pathString") as? NSString
+        }
+        return workspacePath
+    }
 }
 
