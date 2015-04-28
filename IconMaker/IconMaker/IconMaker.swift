@@ -81,6 +81,28 @@ class IconMaker: NSObject {
         return workspacePath
     }
     
+    func resizeImage(#img: NSImage, stringSize: NSString, stringScale: NSString, savePath: NSString) -> NSString? {
+        var size: Double? = stringSize.componentsSeparatedByString("x").first?.doubleValue
+        var scale: Double? = stringScale.componentsSeparatedByString("x").first?.doubleValue
+        var imgName: String? = nil
+        if let sz = size, let sc = scale {
+            var resultSize = NSSize(width: sz * sc, height: sz * sc)
+            println(resultSize)
+            img.size = resultSize
+            println(img)
+            var bitmapRep = NSBitmapImageRep(focusedViewRect: NSRect(x: 0.0, y: 0.0, width: img.size.width, height: img.size.height))
+            var data = dataFromImage(img, size: Int(sz * sc))
+            imgName = "Icon-\(sz)@\(stringScale).png"
+            if let d = data, imn = imgName {
+                var success = d.writeToFile(savePath.stringByAppendingPathComponent(imn) as String, atomically: true)
+                if false == success {
+                    imgName = nil
+                }
+            }
+        }
+        return imgName
+    }
+    
     func dataFromImage(image: NSImage, size: Int) -> NSData? {
         var imageData: NSData? = nil
         var representation = NSBitmapImageRep(bitmapDataPlanes: nil,
