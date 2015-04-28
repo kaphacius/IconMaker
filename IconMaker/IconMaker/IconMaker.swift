@@ -59,6 +59,7 @@ class IconMaker: NSObject {
         }
         return fileURL
     }
+    
     func getWorkspacePath() -> NSString? {
         var workspacePath: NSString? = nil
         var workspaceWindowControllers: AnyObject = NSClassFromString("IDEWorkspaceWindowController")
@@ -78,6 +79,32 @@ class IconMaker: NSObject {
             workspacePath = workspace?.valueForKey("representingFilePath")?.valueForKey("_pathString") as? NSString
         }
         return workspacePath
+    }
+    
+    func dataFromImage(image: NSImage, size: Int) -> NSData? {
+        var imageData: NSData? = nil
+        var representation = NSBitmapImageRep(bitmapDataPlanes: nil,
+            pixelsWide: size,
+            pixelsHigh: size,
+            bitsPerSample: 8,
+            samplesPerPixel: 4,
+            hasAlpha: true,
+            isPlanar: false,
+            colorSpaceName: NSCalibratedRGBColorSpace,
+            bytesPerRow: 0,
+            bitsPerPixel: 0)
+        if let r = representation {
+            r.size = NSSize(width: size, height: size)
+            NSGraphicsContext.saveGraphicsState()
+            NSGraphicsContext.setCurrentContext(NSGraphicsContext(bitmapImageRep: r))
+            image.drawInRect(NSRect(x: 0, y: 0, width: size, height: size),
+                fromRect: NSZeroRect,
+                operation: NSCompositingOperation.CompositeCopy,
+                fraction: 1.0)
+            NSGraphicsContext.restoreGraphicsState()
+            imageData = r.representationUsingType(NSBitmapImageFileType.NSPNGFileType, properties: [NSObject: AnyObject]())
+        }
+        return imageData
     }
 }
 
