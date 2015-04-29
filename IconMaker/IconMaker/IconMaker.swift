@@ -31,21 +31,26 @@ class IconMaker: NSObject {
 
     func createMenuItems() {
         var item = NSApp.mainMenu!!.itemWithTitle("Edit")
-        if item != nil {
+        if let i = item {
             var actionMenuItem = NSMenuItem(title:"Make an app icon", action:"doMenuAction", keyEquivalent:"")
             actionMenuItem.target = self
-            item!.submenu!.addItem(NSMenuItem.separatorItem())
-            item!.submenu!.addItem(actionMenuItem)
+            i.submenu!.addItem(NSMenuItem.separatorItem())
+            i.submenu!.addItem(actionMenuItem)
         }
     }
 
     func doMenuAction() {
-        if let oiu = getOriginalImageUrl() {
+        if let originalImagePath = getOriginalImagePath(),
+            let originalImage = loadImageAtPath(originalImagePath),
+            let workspacePath = getWorkspacePath(),
+            let iconFolderPath = getIconFolderPath(workspacePath),
+            let iconJSONPath = getIconJSONPath(iconFolderPath)
+        {
             
         }
     }
     
-    func getOriginalImageUrl() -> NSURL? {
+    func getOriginalImagePath() -> NSString? {
         var openPanel = NSOpenPanel()
         openPanel.allowedFileTypes = ["png"]
         openPanel.canChooseFiles = true
@@ -57,7 +62,11 @@ class IconMaker: NSObject {
         if (NSFileHandlingPanelOKButton == result) {
             fileURL = openPanel.URL
         }
-        return fileURL
+        return fileURL?.absoluteString
+    }
+    
+    func loadImageAtPath(imagePath: NSString) -> NSImage? {
+        return NSImage(contentsOfFile: imagePath as String)
     }
     
     func getWorkspacePath() -> NSString? {
@@ -79,6 +88,14 @@ class IconMaker: NSObject {
             workspacePath = workspace?.valueForKey("representingFilePath")?.valueForKey("_pathString") as? NSString
         }
         return workspacePath
+    }
+    
+    func getIconJSONPath(iconFolderPath: NSString) -> NSString? {
+        return iconFolderPath.stringByAppendingPathComponent("Contents.json")
+    }
+    
+    func getIconFolderPath(workspacePath: NSString) -> NSString? {
+        return workspacePath.stringByAppendingPathExtension("Images.xcassets")?.stringByAppendingPathComponent("AppIcon.appiconset")
     }
     
     func resizeImage(#img: NSImage, stringSize: NSString, stringScale: NSString, savePath: NSString) -> NSString? {
