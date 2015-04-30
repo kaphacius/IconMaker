@@ -44,13 +44,23 @@ class IconMaker: NSObject {
             let originalImage = loadImageAtPath(originalImagePath),
             let workspacePath = getWorkspacePath(),
             let iconFolderPath = getIconFolderPath(workspacePath),
-            let iconJSONPath = getIconJSONPath(iconFolderPath)
+            let iconJSONPath = getIconJSONPath(iconFolderPath),
+            let jsonDict = getJSONDict(iconJSONPath),
+            let imagesArray = jsonDict["images"] as? NSArray
         {
-            
+            for singleImage in imagesArray {
+                if let si = singleImage as? NSMutableDictionary,
+                    let size = si["size"] as? String,
+                    let scale = si["scale"] as? String,
+                    let resultName = resizeImage(img: originalImage, stringSize: size, stringScale: scale, savePath: iconFolderPath) {
+                        si["filename"] = resultName
+                }
+            }
+            saveResultingIconJSON(jsonDict, savePath: iconJSONPath)
         }
     }
     
-    func getOriginalImagePath() -> NSString? {
+    func getOriginalImagePath() -> NSURL? {
         var openPanel = NSOpenPanel()
         openPanel.allowedFileTypes = ["png"]
         openPanel.canChooseFiles = true
@@ -62,11 +72,11 @@ class IconMaker: NSObject {
         if (NSFileHandlingPanelOKButton == result) {
             fileURL = openPanel.URL
         }
-        return fileURL?.absoluteString
+        return fileURL
     }
     
-    func loadImageAtPath(imagePath: NSString) -> NSImage? {
-        return NSImage(contentsOfFile: imagePath as String)
+    func loadImageAtPath(imagePathURL: NSURL) -> NSImage? {
+        return NSImage(contentsOfURL: imagePathURL)
     }
     
     func getWorkspacePath() -> NSString? {
@@ -95,7 +105,15 @@ class IconMaker: NSObject {
     }
     
     func getIconFolderPath(workspacePath: NSString) -> NSString? {
-        return workspacePath.stringByAppendingPathExtension("Images.xcassets")?.stringByAppendingPathComponent("AppIcon.appiconset")
+        return workspacePath.stringByDeletingPathExtension.stringByAppendingPathComponent("Images.xcassets").stringByAppendingPathComponent("AppIcon.appiconset")
+    }
+    
+    func getJSONDict(jsonDictPath: NSString) -> NSDictionary? {
+        var jsonDict: NSDictionary? = nil
+        if let data = NSData(contentsOfFile: jsonDictPath as String) {
+            jsonDict = NSJSONSerialization.JSONObjectWithData(data, options: NSJSONReadingOptions.MutableContainers, error: nil) as? NSDictionary
+        }
+        return jsonDict
     }
     
     func resizeImage(#img: NSImage, stringSize: NSString, stringScale: NSString, savePath: NSString) -> NSString? {
@@ -104,9 +122,7 @@ class IconMaker: NSObject {
         var imgName: String? = nil
         if let sz = size, let sc = scale {
             var resultSize = NSSize(width: sz * sc, height: sz * sc)
-            println(resultSize)
             img.size = resultSize
-            println(img)
             var bitmapRep = NSBitmapImageRep(focusedViewRect: NSRect(x: 0.0, y: 0.0, width: img.size.width, height: img.size.height))
             var data = dataFromImage(img, size: Int(sz * sc))
             imgName = "Icon-\(sz)@\(stringScale).png"
@@ -144,6 +160,10 @@ class IconMaker: NSObject {
             imageData = r.representationUsingType(NSBitmapImageFileType.NSPNGFileType, properties: [NSObject: AnyObject]())
         }
         return imageData
+    }
+    
+    func saveResultingIconJSON(jsonDict: NSDictionary, savePath: NSString) {
+        NSJSONSerialization.dataWithJSONObject(jsonDict, options: NSJSONWritingOptions.PrettyPrinted, error: nil)?.writeToFile(savePath as String, options: NSDataWritingOptions.AtomicWrite, error: nil)
     }
 }
 
