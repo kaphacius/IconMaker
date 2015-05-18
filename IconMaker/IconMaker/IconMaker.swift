@@ -105,7 +105,19 @@ class IconMaker: NSObject {
     }
     
     func getIconFolderPath(workspacePath: NSString) -> NSString? {
-        return workspacePath.stringByDeletingPathExtension.stringByAppendingPathComponent("Images.xcassets").stringByAppendingPathComponent("AppIcon.appiconset")
+        var homeFolderPath = workspacePath.stringByDeletingLastPathComponent
+        println(homeFolderPath)
+        var iconFolderPath: NSString? = nil
+        if let list = NSFileManager.defaultManager().subpathsOfDirectoryAtPath(homeFolderPath as String, error: nil) as? [NSString] {
+            for item in list {
+                println("item: \(item)")
+                if item.lastPathComponent == "AppIcon.appiconset" {
+                    iconFolderPath = homeFolderPath.stringByAppendingPathComponent(item as String)
+                }
+            }
+        }
+        println(iconFolderPath)
+        return iconFolderPath
     }
     
     func getJSONDict(jsonDictPath: NSString) -> NSDictionary? {
