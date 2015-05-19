@@ -57,7 +57,14 @@ class IconMaker: NSObject {
                 }
             }
             saveResultingIconJSON(jsonDict, savePath: iconJSONPath)
+        } else {
+            showError()
         }
+    }
+    
+    func showError() {
+        let error = NSError(domain: "Something went wrong :(", code:0, userInfo:nil)
+        NSAlert(error: error).runModal()
     }
     
     func getOriginalImagePath() -> NSURL? {
@@ -106,17 +113,16 @@ class IconMaker: NSObject {
     
     func getIconFolderPath(workspacePath: NSString) -> NSString? {
         var homeFolderPath = workspacePath.stringByDeletingLastPathComponent
-        println(homeFolderPath)
         var iconFolderPath: NSString? = nil
         if let list = NSFileManager.defaultManager().subpathsOfDirectoryAtPath(homeFolderPath as String, error: nil) as? [NSString] {
             for item in list {
                 println("item: \(item)")
-                if item.lastPathComponent == "AppIcon.appiconset" {
-                    iconFolderPath = homeFolderPath.stringByAppendingPathComponent(item as String)
+                if item.stringByDeletingPathExtension.lastPathComponent == "AppDelegate" {
+                    iconFolderPath = homeFolderPath.stringByAppendingPathComponent(item.stringByDeletingLastPathComponent).stringByAppendingPathComponent("Images.xcassets").stringByAppendingPathComponent("AppIcon.appiconset")
+                    break
                 }
             }
         }
-        println(iconFolderPath)
         return iconFolderPath
     }
     
