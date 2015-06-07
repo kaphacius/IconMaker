@@ -22,7 +22,9 @@ class IconMaker: NSObject {
     init(bundle: NSBundle) {
         self.bundle = bundle
         super.init()
-        createMenuItems()
+        dispatch_async(dispatch_get_main_queue(), { () -> Void in
+            self.createMenuItems()
+        })
     }
 
     deinit {
@@ -30,6 +32,7 @@ class IconMaker: NSObject {
     }
 
     func createMenuItems() {
+        var menu = NSApp.mainMenu
         var item = NSApp.mainMenu!!.itemWithTitle("Edit")
         if let i = item {
             var actionMenuItem = NSMenuItem(title:"Make an app icon", action:"doMenuAction", keyEquivalent:"")
