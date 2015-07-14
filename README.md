@@ -3,6 +3,10 @@ an Xcode plug-in for making app icons
 
 Go to Edit -> Make an app icon
 
+* Assets file must be named 'Images.xcassets'
+* Assets file must be located in project root
+* AppIcon asset must be named 'AppIcon'
+
 install through [alcatraz](http://alcatraz.io)
 or clone and run, then relaunch Xcode
 
