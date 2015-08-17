@@ -9,6 +9,10 @@ import AppKit
 
 var sharedPlugin: IconMaker?
 
+enum Error : ErrorType {
+    case IconMakerError(String)
+}
+
 class IconMaker: NSObject {
     var bundle: NSBundle
 
@@ -22,7 +26,8 @@ class IconMaker: NSObject {
     init(bundle: NSBundle) {
         self.bundle = bundle
         super.init()
-        dispatch_async(dispatch_get_main_queue(), { () -> Void in
+        dispatch_async(dispatch_get_main_queue(), {
+            () -> Void in
             self.createMenuItems()
         })
     }
@@ -32,72 +37,95 @@ class IconMaker: NSObject {
     }
 
     func createMenuItems() {
-        var menu = NSApp.mainMenu
-        var item = NSApp.mainMenu!!.itemWithTitle("Edit")
+        let item = NSApp.mainMenu!.itemWithTitle("Edit")
         if let i = item {
-            var actionMenuItem = NSMenuItem(title:"Make an app icon", action:"doMenuAction", keyEquivalent:"")
+            let actionMenuItem = NSMenuItem(title: "Make an app icon", action: "doMenuActionSecure", keyEquivalent: "")
             actionMenuItem.target = self
             i.submenu!.addItem(NSMenuItem.separatorItem())
             i.submenu!.addItem(actionMenuItem)
         }
     }
 
-    func doMenuAction() {
-        if let originalImagePath = getOriginalImagePath(),
-            let originalImage = loadImageAtPath(originalImagePath),
-            let workspacePath = getWorkspacePath(),
-            let iconFolderPath = getIconFolderPath(workspacePath),
-            let iconJSONPath = getIconJSONPath(iconFolderPath),
-            let jsonDict = getJSONDict(iconJSONPath),
-            let imagesArray = jsonDict["images"] as? NSArray
-        {
-            for singleImage in imagesArray {
-                if let si = singleImage as? NSMutableDictionary,
-                    let size = si["size"] as? String,
-                    let scale = si["scale"] as? String,
-                    let resultName = resizeImage(img: originalImage, stringSize: size, stringScale: scale, savePath: iconFolderPath) {
-                        si["filename"] = resultName
-                }
-            }
-            saveResultingIconJSON(jsonDict, savePath: iconJSONPath)
-        } else {
+    func doMenuActionSecure() {
+        do {
+            try doMenuAction()
+        } catch let Error.IconMakerError(x) {
+                self.showError(x);
+        } catch {
             showError()
         }
     }
-    
-    func showError() {
-        let error = NSError(domain: "Something went wrong :(", code:0, userInfo:nil)
+
+    func doMenuAction() throws {
+        let originalImagePath = try getOriginalImagePath();
+        let originalImage = try loadImageAtPath(originalImagePath);
+        
+        let workspacePath = try getWorkspacePath()
+        let iconFolderPath = try getIconFolderPath(workspacePath)
+        let iconJSONPath = getIconJSONPath(iconFolderPath);
+        let jsonDict = try getJSONDict(iconJSONPath)
+        
+        if let imagesArray = jsonDict["images"] as? NSArray {
+            for singleImage in imagesArray {
+                if let si = singleImage as? NSMutableDictionary,
+                let size = si["size"] as? String,
+                let scale = si["scale"] as? String,
+                let resultName = self.resizeImage(img: originalImage, stringSize: size, stringScale: scale, savePath: iconFolderPath) {
+                    si["filename"] = resultName
+                }
+            }
+            self.saveResultingIconJSON(jsonDict, savePath: iconJSONPath)
+        } else {
+            throw Error.IconMakerError("Cannot ge images array from jsonDict : \(jsonDict)")
+        }
+     }
+
+    func showError(message: String? = nil) {
+        var error = NSError(domain: "Something went wrong :(", code: 0, userInfo: nil);
+        if let message = message {
+            error = NSError(domain: "Something went wrong :(", code: 0, userInfo: [
+                    NSLocalizedDescriptionKey: message
+            ])
+        }
         NSAlert(error: error).runModal()
     }
-    
-    func getOriginalImagePath() -> NSURL? {
-        var openPanel = NSOpenPanel()
+
+    func getOriginalImagePath()  throws -> NSURL {
+        let openPanel = NSOpenPanel()
         openPanel.allowedFileTypes = ["png"]
         openPanel.canChooseFiles = true
         openPanel.canCreateDirectories = false
         openPanel.allowsMultipleSelection = false
-        
+
         var fileURL: NSURL? = nil
-        var result = openPanel.runModal()
+        let result = openPanel.runModal()
         if (NSFileHandlingPanelOKButton == result) {
             fileURL = openPanel.URL
         }
-        return fileURL
+        
+        guard let afileURL = fileURL else {
+            throw Error.IconMakerError("Original image cannot be found");
+        }
+        return afileURL
     }
-    
-    func loadImageAtPath(imagePathURL: NSURL) -> NSImage? {
-        return NSImage(contentsOfURL: imagePathURL)
+
+    func loadImageAtPath(imagePathURL: NSURL) throws -> NSImage {
+        let image = NSImage(contentsOfURL: imagePathURL)
+        guard let aimage = image else {
+            throw Error.IconMakerError("Image cannot be loaded at Path \(imagePathURL)")
+        }
+        return aimage
     }
-    
-    func getWorkspacePath() -> NSString? {
+
+    func getWorkspacePath() throws -> String {
         var workspacePath: NSString? = nil
-        var workspaceWindowControllers: AnyObject = NSClassFromString("IDEWorkspaceWindowController")
-        var controllers = workspaceWindowControllers.valueForKey("workspaceWindowControllers") as? NSArray
+        let workspaceWindowControllers: AnyObject = NSClassFromString("IDEWorkspaceWindowController")!
+        let controllers = workspaceWindowControllers.valueForKey("workspaceWindowControllers") as? NSArray
         var workspace: AnyObject? = nil
         if let c = controllers {
             for controller in c {
-                var window: AnyObject? = controller.valueForKey("window")
-                var keyWindow = NSApp.keyWindow
+                let window: AnyObject? = controller.valueForKey("window")
+                let keyWindow = NSApp.keyWindow
                 if let w: AnyObject = window, let kw: AnyObject = keyWindow as? AnyObject {
                     if true == w.isEqual(kw) {
                         workspace = controller.valueForKey("_workspace")
@@ -107,48 +135,58 @@ class IconMaker: NSObject {
             }
             workspacePath = workspace?.valueForKey("representingFilePath")?.valueForKey("_pathString") as? NSString
         }
-        return workspacePath
+        guard let aworkspacePath = workspacePath else {
+            throw Error.IconMakerError("Workspace URL cannot be found");
+        }
+        return aworkspacePath as String
     }
-    
-    func getIconJSONPath(iconFolderPath: NSString) -> NSString? {
-        return iconFolderPath.stringByAppendingPathComponent("Contents.json")
+
+    func getIconJSONPath(iconFolderPath: String) -> String {
+        return iconFolderPath.stringByAppendingPathComponent("Contents.json");
     }
-    
-    func getIconFolderPath(workspacePath: NSString) -> NSString? {
-        var homeFolderPath = workspacePath.stringByDeletingLastPathComponent
+
+    func getIconFolderPath(workspacePath: NSString) throws -> String {
+        let homeFolderPath = workspacePath.stringByDeletingLastPathComponent
         var iconFolderPath: NSString? = nil
-        if let list = NSFileManager.defaultManager().subpathsOfDirectoryAtPath(homeFolderPath as String, error: nil) as? [NSString] {
-            for item in list {
-                println("item: \(item)")
-                if item.stringByDeletingPathExtension.lastPathComponent == "AppDelegate" {
-                    iconFolderPath = homeFolderPath.stringByAppendingPathComponent(item.stringByDeletingLastPathComponent).stringByAppendingPathComponent("Images.xcassets").stringByAppendingPathComponent("AppIcon.appiconset")
-                    break
-                }
+        let list = try NSFileManager.defaultManager().subpathsOfDirectoryAtPath(homeFolderPath)
+        for item in list {
+            if item.lastPathComponent == "Images.xcassets" {
+                iconFolderPath = homeFolderPath.stringByAppendingPathComponent(item).stringByAppendingPathComponent("AppIcon.appiconset");
+//                    iconFolderPath = homeFolderPath.stringByAppendingPathComponent(item.stringByDeletingLastPathComponent).stringByAppendingPathComponent("Images.xcassets").
+                break
             }
         }
-        return iconFolderPath
+
+
+        guard let aiconFolderPath = iconFolderPath else {
+            throw Error.IconMakerError("Cannot get icon folder path for specified workspace path \(workspacePath)")
+        }
+        return aiconFolderPath as String
     }
-    
-    func getJSONDict(jsonDictPath: NSString) -> NSDictionary? {
+
+    func getJSONDict(jsonDictPath: NSString) throws -> NSDictionary {
         var jsonDict: NSDictionary? = nil
         if let data = NSData(contentsOfFile: jsonDictPath as String) {
-            jsonDict = NSJSONSerialization.JSONObjectWithData(data, options: NSJSONReadingOptions.MutableContainers, error: nil) as? NSDictionary
+            try jsonDict = NSJSONSerialization.JSONObjectWithData(data, options: NSJSONReadingOptions.MutableContainers) as? NSDictionary
         }
-        return jsonDict
+        
+        guard let ajsonDict = jsonDict else {
+            throw Error.IconMakerError("Cannot get valid JSON at path \(jsonDictPath)")
+        }
+        return ajsonDict
     }
-    
-    func resizeImage(#img: NSImage, stringSize: NSString, stringScale: NSString, savePath: NSString) -> NSString? {
-        var size: Double? = stringSize.componentsSeparatedByString("x").first?.doubleValue
-        var scale: Double? = stringScale.componentsSeparatedByString("x").first?.doubleValue
+
+    func resizeImage(img img: NSImage, stringSize: String, stringScale: String, savePath: String) -> String? {
+        let size: Int32? = NSString(string: stringSize.componentsSeparatedByString("x").first!).intValue
+        let scale: Int32? = NSString(string: stringScale.componentsSeparatedByString("x").first!).intValue
         var imgName: String? = nil
         if let sz = size, let sc = scale {
-            var resultSize = NSSize(width: sz * sc, height: sz * sc)
+            let resultSize = NSSize(width: Double(sz * sc), height: Double(sz * sc))
             img.size = resultSize
-            var bitmapRep = NSBitmapImageRep(focusedViewRect: NSRect(x: 0.0, y: 0.0, width: img.size.width, height: img.size.height))
-            var data = dataFromImage(img, size: Int(sz * sc))
+            let data = dataFromImage(img, size: Int(sz * sc))
             imgName = "Icon-\(sz)@\(stringScale).png"
             if let d = data, imn = imgName {
-                var success = d.writeToFile(savePath.stringByAppendingPathComponent(imn) as String, atomically: true)
+                let success = d.writeToFile(savePath.stringByAppendingPathComponent(imn) as String, atomically: true)
                 if false == success {
                     imgName = nil
                 }
@@ -156,35 +194,38 @@ class IconMaker: NSObject {
         }
         return imgName
     }
-    
+
     func dataFromImage(image: NSImage, size: Int) -> NSData? {
         var imageData: NSData? = nil
-        var representation = NSBitmapImageRep(bitmapDataPlanes: nil,
-            pixelsWide: size,
-            pixelsHigh: size,
-            bitsPerSample: 8,
-            samplesPerPixel: 4,
-            hasAlpha: true,
-            isPlanar: false,
-            colorSpaceName: NSCalibratedRGBColorSpace,
-            bytesPerRow: 0,
-            bitsPerPixel: 0)
+        let representation = NSBitmapImageRep(bitmapDataPlanes: nil,
+                pixelsWide: size,
+                pixelsHigh: size,
+                bitsPerSample: 8,
+                samplesPerPixel: 4,
+                hasAlpha: true,
+                isPlanar: false,
+                colorSpaceName: NSCalibratedRGBColorSpace,
+                bytesPerRow: 0,
+                bitsPerPixel: 0)
         if let r = representation {
             r.size = NSSize(width: size, height: size)
             NSGraphicsContext.saveGraphicsState()
             NSGraphicsContext.setCurrentContext(NSGraphicsContext(bitmapImageRep: r))
             image.drawInRect(NSRect(x: 0, y: 0, width: size, height: size),
-                fromRect: NSZeroRect,
-                operation: NSCompositingOperation.CompositeCopy,
-                fraction: 1.0)
+                    fromRect: NSZeroRect,
+                    operation: NSCompositingOperation.CompositeCopy,
+                    fraction: 1.0)
             NSGraphicsContext.restoreGraphicsState()
-            imageData = r.representationUsingType(NSBitmapImageFileType.NSPNGFileType, properties: [NSObject: AnyObject]())
+            imageData = r.representationUsingType(NSBitmapImageFileType.NSPNGFileType, properties: [:])
         }
         return imageData
     }
-    
+
     func saveResultingIconJSON(jsonDict: NSDictionary, savePath: NSString) {
-        NSJSONSerialization.dataWithJSONObject(jsonDict, options: NSJSONWritingOptions.PrettyPrinted, error: nil)?.writeToFile(savePath as String, options: NSDataWritingOptions.AtomicWrite, error: nil)
+        do {
+            try NSJSONSerialization.dataWithJSONObject(jsonDict, options: NSJSONWritingOptions.PrettyPrinted).writeToFile(savePath as String, options: NSDataWritingOptions.AtomicWrite)
+        } catch _ {
+        }
     }
 }
 
