@@ -7,48 +7,48 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		990BBE391AED679D002E73A5 /* IconMaker.xcscheme in Resources */ = {isa = PBXBuildFile; fileRef = 990BBE381AED679D002E73A5 /* IconMaker.xcscheme */; };
-		990BBE3B1AED679D002E73A5 /* IconMaker.swift in Sources */ = {isa = PBXBuildFile; fileRef = 990BBE3A1AED679D002E73A5 /* IconMaker.swift */; };
+		99E6BCBF1BA9C796004BCF8E /* IconMaker.xcscheme in Resources */ = {isa = PBXBuildFile; fileRef = 99E6BCBE1BA9C796004BCF8E /* IconMaker.xcscheme */; };
+		99E6BCC11BA9C796004BCF8E /* IconMaker.swift in Sources */ = {isa = PBXBuildFile; fileRef = 99E6BCC01BA9C796004BCF8E /* IconMaker.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
-		990BBE331AED679D002E73A5 /* IconMaker.xcplugin */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = IconMaker.xcplugin; sourceTree = BUILT_PRODUCTS_DIR; };
-		990BBE371AED679D002E73A5 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		990BBE381AED679D002E73A5 /* IconMaker.xcscheme */ = {isa = PBXFileReference; lastKnownFileType = text.xml; name = IconMaker.xcscheme; path = IconMaker.xcodeproj/xcshareddata/xcschemes/IconMaker.xcscheme; sourceTree = SOURCE_ROOT; };
-		990BBE3A1AED679D002E73A5 /* IconMaker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IconMaker.swift; sourceTree = "<group>"; };
+		99E6BCBA1BA9C796004BCF8E /* IconMaker.xcplugin */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = IconMaker.xcplugin; sourceTree = BUILT_PRODUCTS_DIR; };
+		99E6BCBE1BA9C796004BCF8E /* IconMaker.xcscheme */ = {isa = PBXFileReference; lastKnownFileType = text.xml; name = IconMaker.xcscheme; path = IconMaker.xcodeproj/xcshareddata/xcschemes/IconMaker.xcscheme; sourceTree = SOURCE_ROOT; };
+		99E6BCC01BA9C796004BCF8E /* IconMaker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IconMaker.swift; sourceTree = "<group>"; };
+		99E6BCC41BA9C796004BCF8E /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXGroup section */
-		990BBE2B1AED679C002E73A5 = {
+		99E6BCB21BA9C796004BCF8E = {
 			isa = PBXGroup;
 			children = (
-				990BBE351AED679D002E73A5 /* IconMaker */,
-				990BBE341AED679D002E73A5 /* Products */,
+				99E6BCBC1BA9C796004BCF8E /* IconMaker */,
+				99E6BCBB1BA9C796004BCF8E /* Products */,
 			);
 			sourceTree = "<group>";
 		};
-		990BBE341AED679D002E73A5 /* Products */ = {
+		99E6BCBB1BA9C796004BCF8E /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				990BBE331AED679D002E73A5 /* IconMaker.xcplugin */,
+				99E6BCBA1BA9C796004BCF8E /* IconMaker.xcplugin */,
 			);
 			name = Products;
 			sourceTree = "<group>";
 		};
-		990BBE351AED679D002E73A5 /* IconMaker */ = {
+		99E6BCBC1BA9C796004BCF8E /* IconMaker */ = {
 			isa = PBXGroup;
 			children = (
-				990BBE3A1AED679D002E73A5 /* IconMaker.swift */,
-				990BBE361AED679D002E73A5 /* Supporting Files */,
+				99E6BCC01BA9C796004BCF8E /* IconMaker.swift */,
+				99E6BCC41BA9C796004BCF8E /* Info.plist */,
+				99E6BCBD1BA9C796004BCF8E /* Supporting Files */,
 			);
 			path = IconMaker;
 			sourceTree = "<group>";
 		};
-		990BBE361AED679D002E73A5 /* Supporting Files */ = {
+		99E6BCBD1BA9C796004BCF8E /* Supporting Files */ = {
 			isa = PBXGroup;
 			children = (
-				990BBE371AED679D002E73A5 /* Info.plist */,
-				990BBE381AED679D002E73A5 /* IconMaker.xcscheme */,
+				99E6BCBE1BA9C796004BCF8E /* IconMaker.xcscheme */,
 			);
 			name = "Supporting Files";
 			sourceTree = "<group>";
@@ -56,12 +56,12 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
-		990BBE321AED679D002E73A5 /* IconMaker */ = {
+		99E6BCB91BA9C796004BCF8E /* IconMaker */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 990BBE3E1AED679D002E73A5 /* Build configuration list for PBXNativeTarget "IconMaker" */;
+			buildConfigurationList = 99E6BCC71BA9C796004BCF8E /* Build configuration list for PBXNativeTarget "IconMaker" */;
 			buildPhases = (
-				990BBE301AED679D002E73A5 /* Sources */,
-				990BBE311AED679D002E73A5 /* Resources */,
+				99E6BCB71BA9C796004BCF8E /* Sources */,
+				99E6BCB81BA9C796004BCF8E /* Resources */,
 			);
 			buildRules = (
 			);
@@ -69,64 +69,65 @@
 			);
 			name = IconMaker;
 			productName = IconMaker;
-			productReference = 990BBE331AED679D002E73A5 /* IconMaker.xcplugin */;
+			productReference = 99E6BCBA1BA9C796004BCF8E /* IconMaker.xcplugin */;
 			productType = "com.apple.product-type.bundle";
 		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
-		990BBE2C1AED679C002E73A5 /* Project object */ = {
+		99E6BCB31BA9C796004BCF8E /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
-				LastUpgradeCheck = 0630;
+				LastSwiftUpdateCheck = 0700;
+				LastUpgradeCheck = 0700;
 				ORGANIZATIONNAME = "Yurii Zadoianchuk";
 				TargetAttributes = {
-					990BBE321AED679D002E73A5 = {
-						CreatedOnToolsVersion = 6.3.1;
+					99E6BCB91BA9C796004BCF8E = {
+						CreatedOnToolsVersion = 7.0;
 					};
 				};
 			};
-			buildConfigurationList = 990BBE2F1AED679C002E73A5 /* Build configuration list for PBXProject "IconMaker" */;
+			buildConfigurationList = 99E6BCB61BA9C796004BCF8E /* Build configuration list for PBXProject "IconMaker" */;
 			compatibilityVersion = "Xcode 3.2";
 			developmentRegion = English;
 			hasScannedForEncodings = 0;
 			knownRegions = (
 				en,
 			);
-			mainGroup = 990BBE2B1AED679C002E73A5;
-			productRefGroup = 990BBE341AED679D002E73A5 /* Products */;
+			mainGroup = 99E6BCB21BA9C796004BCF8E;
+			productRefGroup = 99E6BCBB1BA9C796004BCF8E /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				990BBE321AED679D002E73A5 /* IconMaker */,
+				99E6BCB91BA9C796004BCF8E /* IconMaker */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
-		990BBE311AED679D002E73A5 /* Resources */ = {
+		99E6BCB81BA9C796004BCF8E /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				990BBE391AED679D002E73A5 /* IconMaker.xcscheme in Resources */,
+				99E6BCBF1BA9C796004BCF8E /* IconMaker.xcscheme in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
-		990BBE301AED679D002E73A5 /* Sources */ = {
+		99E6BCB71BA9C796004BCF8E /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				990BBE3B1AED679D002E73A5 /* IconMaker.swift in Sources */,
+				99E6BCC11BA9C796004BCF8E /* IconMaker.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXSourcesBuildPhase section */
 
 /* Begin XCBuildConfiguration section */
-		990BBE3C1AED679D002E73A5 /* Debug */ = {
+		99E6BCC51BA9C796004BCF8E /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
@@ -144,7 +145,9 @@
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu99;
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_NO_COMMON_BLOCKS = YES;
@@ -153,7 +156,6 @@
 					"DEBUG=1",
 					"$(inherited)",
 				);
-				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
 				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
 				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
 				GCC_WARN_UNDECLARED_SELECTOR = YES;
@@ -165,7 +167,7 @@
 			};
 			name = Debug;
 		};
-		990BBE3D1AED679D002E73A5 /* Release */ = {
+		99E6BCC61BA9C796004BCF8E /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
@@ -183,6 +185,7 @@
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				ENABLE_NS_ASSERTIONS = NO;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu99;
@@ -197,7 +200,7 @@
 			};
 			name = Release;
 		};
-		990BBE3F1AED679D002E73A5 /* Debug */ = {
+		99E6BCC81BA9C796004BCF8E /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				COMBINE_HIDPI_IMAGES = YES;
@@ -208,12 +211,13 @@
 				INSTALL_PATH = "/Library/Application Support/Developer/Shared/Xcode/Plug-ins";
 				LD_RUNPATH_SEARCH_PATHS = "$(DT_TOOLCHAIN_DIR)/usr/lib/swift/macosx";
 				MACOSX_DEPLOYMENT_TARGET = 10.10;
+				PRODUCT_BUNDLE_IDENTIFIER = com.yurii.zadoianchuk.IconMaker;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				WRAPPER_EXTENSION = xcplugin;
 			};
 			name = Debug;
 		};
-		990BBE401AED679D002E73A5 /* Release */ = {
+		99E6BCC91BA9C796004BCF8E /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				COMBINE_HIDPI_IMAGES = YES;
@@ -224,6 +228,7 @@
 				INSTALL_PATH = "/Library/Application Support/Developer/Shared/Xcode/Plug-ins";
 				LD_RUNPATH_SEARCH_PATHS = "$(DT_TOOLCHAIN_DIR)/usr/lib/swift/macosx";
 				MACOSX_DEPLOYMENT_TARGET = 10.10;
+				PRODUCT_BUNDLE_IDENTIFIER = com.yurii.zadoianchuk.IconMaker;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				WRAPPER_EXTENSION = xcplugin;
 			};
@@ -232,25 +237,25 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		990BBE2F1AED679C002E73A5 /* Build configuration list for PBXProject "IconMaker" */ = {
+		99E6BCB61BA9C796004BCF8E /* Build configuration list for PBXProject "IconMaker" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				990BBE3C1AED679D002E73A5 /* Debug */,
-				990BBE3D1AED679D002E73A5 /* Release */,
+				99E6BCC51BA9C796004BCF8E /* Debug */,
+				99E6BCC61BA9C796004BCF8E /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		990BBE3E1AED679D002E73A5 /* Build configuration list for PBXNativeTarget "IconMaker" */ = {
+		99E6BCC71BA9C796004BCF8E /* Build configuration list for PBXNativeTarget "IconMaker" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				990BBE3F1AED679D002E73A5 /* Debug */,
-				990BBE401AED679D002E73A5 /* Release */,
+				99E6BCC81BA9C796004BCF8E /* Debug */,
+				99E6BCC91BA9C796004BCF8E /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};
-	rootObject = 990BBE2C1AED679C002E73A5 /* Project object */;
+	rootObject = 99E6BCB31BA9C796004BCF8E /* Project object */;
 }
