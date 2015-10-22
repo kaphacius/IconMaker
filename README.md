@@ -1,16 +1,13 @@
-# IconMaker
+# IconMaker 2.0
 an Xcode plug-in for making app icons
 
-Go to Edit -> Make an app icon
-
-* Assets file must be named 'Images.xcassets'
-* Assets file must be located in project root
-* AppIcon asset must be named 'AppIcon'
-
-install through [alcatraz](http://alcatraz.io)
-or clone and run, then relaunch Xcode
-
+Works on Xcode 7.0, 7.1 beta
 ###How to use
 ![how to use](https://raw.githubusercontent.com/kaphacius/IconMaker/master/screencast.gif)
 
-If you need a feature/found a bug - please open an issue
+1. Navigate to the icon in asset catalog.
+2. Right click and select 'Make An App Icon'
+3. Select an image and press 'Okay'
+
+install through [alcatraz](http://alcatraz.io)
+or clone, build&run, then relaunch Xcode
