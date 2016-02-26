@@ -1,7 +1,7 @@
 # IconMaker 2.0
 an Xcode plug-in for making app icons
 
-Works on Xcode 7.0, 7.1 beta
+Works on Xcode 7.0 - 7.3
 ###How to use
 ![how to use](https://raw.githubusercontent.com/kaphacius/IconMaker/master/screencast.gif)
 
