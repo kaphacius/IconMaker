@@ -31,7 +31,7 @@ class IconMaker: NSObject {
         self.bundle = bundle
         super.init()
         NSNotificationCenter.defaultCenter().addObserver(self,
-            selector: "appDidFinishLaunchingNotification:",
+            selector: #selector(IconMaker.appDidFinishLaunchingNotification(_:)),
             name: NSApplicationDidFinishLaunchingNotification,
             object: nil)
     }
@@ -173,8 +173,8 @@ class IconMaker: NSObject {
 extension NSTableView {
     
     static func swizzleStuff() {
-        let originalSelector = Selector("menuForEvent:")
-        let swizzledSelector = Selector("im_menuForEvent:")
+        let originalSelector = #selector(NSView.menuForEvent(_:))
+        let swizzledSelector = #selector(NSTableView.im_menuForEvent(_:))
         
         let originalMethod = class_getInstanceMethod(NSTableView.self, originalSelector)
         let swizzledMethod = class_getInstanceMethod(NSTableView.self, swizzledSelector)
@@ -198,10 +198,10 @@ extension NSTableView {
             menu.removeItem(ii)
         }
         if "IBICSourceListOutlineView" == self.className {
-            if let selectedItems = self.performSelector("selectedItems")?.takeUnretainedValue() as? NSArray,
+            if let selectedItems = self.performSelector(Selector("selectedItems"))?.takeUnretainedValue() as? NSArray,
                 let outlineViewItem = selectedItems.firstObject as? NSObject where "IBICOutlineViewItem" == outlineViewItem.className {
-                    if let catalogItem = outlineViewItem.performSelector("catalogItem").takeUnretainedValue() as? NSObject where catalogItem.className == "IBICAppIconSet" {
-                        if let url = catalogItem.performSelector("absoluteFileURL").takeUnretainedValue() as? NSURL,
+                    if let catalogItem = outlineViewItem.performSelector(Selector("catalogItem")).takeUnretainedValue() as? NSObject where catalogItem.className == "IBICAppIconSet" {
+                        if let url = catalogItem.performSelector(Selector("absoluteFileURL")).takeUnretainedValue() as? NSURL,
                             let smi = separatorMenuItem,
                             let imi = iconMenuItem {
                                 iconSetURL = url
@@ -215,7 +215,7 @@ extension NSTableView {
     }
     
     static func createIconMenuItem() -> NSMenuItem {
-        let iconMenuIcon = NSMenuItem(title:"Make An App Icon", action:"doMenuAction", keyEquivalent:"")
+        let iconMenuIcon = NSMenuItem(title:"Make An App Icon", action:#selector(IconMaker.doMenuAction), keyEquivalent:"")
         iconMenuIcon.target = sharedPlugin
         return iconMenuIcon
     }
