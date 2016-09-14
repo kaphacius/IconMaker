@@ -84,7 +84,6 @@
 				TargetAttributes = {
 					99E6BCB91BA9C796004BCF8E = {
 						CreatedOnToolsVersion = 7.0;
-						DevelopmentTeam = AF3826P4Z5;
 						LastSwiftMigration = 0800;
 					};
 				};
@@ -213,10 +212,10 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
-				CODE_SIGN_IDENTITY = "Mac Developer: yurii.zadoianchuk@gmail.com (W5ZU4K79EA)";
+				CODE_SIGN_IDENTITY = "";
 				COMBINE_HIDPI_IMAGES = YES;
 				DEPLOYMENT_LOCATION = YES;
-				DEVELOPMENT_TEAM = AF3826P4Z5;
+				DEVELOPMENT_TEAM = "";
 				DSTROOT = "$(HOME)";
 				INFOPLIST_FILE = IconMaker/Info.plist;
 				INSTALL_PATH = "/Library/Application Support/Developer/Shared/Xcode/Plug-ins";
@@ -233,10 +232,10 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
-				CODE_SIGN_IDENTITY = "Mac Developer: yurii.zadoianchuk@gmail.com (W5ZU4K79EA)";
+				CODE_SIGN_IDENTITY = "";
 				COMBINE_HIDPI_IMAGES = YES;
 				DEPLOYMENT_LOCATION = YES;
-				DEVELOPMENT_TEAM = AF3826P4Z5;
+				DEVELOPMENT_TEAM = "";
 				DSTROOT = "$(HOME)";
 				INFOPLIST_FILE = IconMaker/Info.plist;
 				INSTALL_PATH = "/Library/Application Support/Developer/Shared/Xcode/Plug-ins";
