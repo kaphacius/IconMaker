@@ -10,60 +10,60 @@ import AppKit
 var sharedPlugin: IconMaker? = nil
 var separatorMenuItem: NSMenuItem? = nil
 var iconMenuItem: NSMenuItem? = nil
-var iconSetURL: NSURL? = nil
+var iconSetURL: URL? = nil
 
-enum Error: ErrorType {
-    case StringError(String)
-    case CancelPressed
+enum IconMakerError: Error {
+    case stringError(String)
+    case cancelPressed
 }
 
 class IconMaker: NSObject {
-    var bundle: NSBundle
+    var bundle: Bundle
     
-    class func pluginDidLoad(bundle: NSBundle) {
-        let appName = NSBundle.mainBundle().infoDictionary?["CFBundleName"] as? NSString
+    class func pluginDidLoad(_ bundle: Bundle) {
+        let appName = Bundle.main.infoDictionary?["CFBundleName"] as? NSString
         if appName == "Xcode" {
             sharedPlugin = IconMaker(bundle: bundle)
         }
     }
     
-    init(bundle: NSBundle) {
+    init(bundle: Bundle) {
         self.bundle = bundle
         super.init()
-        NSNotificationCenter.defaultCenter().addObserver(self,
-            selector: "appDidFinishLaunchingNotification:",
-            name: NSApplicationDidFinishLaunchingNotification,
-            object: nil)
+        NotificationCenter.default.addObserver(self,
+                                               selector: #selector(appDidFinishLaunchingNotification),
+                                               name: NSNotification.Name.NSApplicationDidFinishLaunching,
+                                               object: nil)
     }
     
     func appDidFinishLaunchingNotification(n: NSNotification) {
         NSTableView.swizzleStuff()
-        NSNotificationCenter.defaultCenter().removeObserver(self)
+        NotificationCenter.default.removeObserver(self)
     }
     
-    func doMenuAction() {
+    @objc func doMenuAction() {
         do {
-            let originalImage = try self.loadImageAtPath(try self.getOriginalImagePath())
+            let originalImage = try self.loadImageAtPath(imagePathURL: try self.getOriginalImagePath())
             guard let isu = iconSetURL else {
-                throw Error.StringError("Error obtaining result icon path")
+                throw IconMakerError.stringError("Error obtaining result icon path")
             }
-            let iconJSONPath = getIconJSONPath(isu)
-            let jsonDict = try getJSONDict(iconJSONPath)
+            let iconJSONPath = getIconJSONPath(iconFolderPath: isu)
+            let jsonDict = try getJSONDict(jsonDictPath: iconJSONPath)
             guard let sizesArray = jsonDict["images"] as? NSArray else {
-                throw Error.StringError("Error retrieving icon sizes from icon JSON")
+                throw IconMakerError.stringError("Error retrieving icon sizes from icon JSON")
             }
             for singleSize in sizesArray {
                 guard let si = singleSize as? NSMutableDictionary,
                     let size = si["size"] as? String,
                     let scale = si["scale"] as? String else {
-                        throw Error.StringError("")
+                        throw IconMakerError.stringError("")
                 }
-                let resultName = try resizeImage(originalImage, stringSize: size, stringScale: scale, savePath: isu)
+                let resultName = try resizeImage(img: originalImage, stringSize: size, stringScale: scale, savePath: isu)
                 si["filename"] = resultName
             }
-            try saveResultingIconJSON(jsonDict, savePath: iconJSONPath)
-        } catch Error.StringError(let description) {
-            showError(description)
+            try saveResultingIconJSON(jsonDict: jsonDict, savePath: iconJSONPath)
+        } catch IconMakerError.stringError(let description) {
+            showError(description: description)
         } catch _ {
             
         }
@@ -74,7 +74,7 @@ class IconMaker: NSObject {
         NSAlert(error: error).runModal()
     }
     
-    func getOriginalImagePath() throws -> NSURL {
+    func getOriginalImagePath() throws -> URL {
         let openPanel = NSOpenPanel()
         openPanel.allowedFileTypes = ["png"]
         openPanel.canChooseFiles = true
@@ -83,89 +83,90 @@ class IconMaker: NSObject {
         
         let result = openPanel.runModal()
         guard NSFileHandlingPanelOKButton == result else {
-            throw Error.CancelPressed
+            throw IconMakerError.cancelPressed
         }
-        guard let u = openPanel.URL else {
-            throw Error.StringError("Error obtaining original image path")
+        guard let u = openPanel.url else {
+            throw IconMakerError.stringError("Error obtaining original image path")
         }
         return u
     }
     
-    func loadImageAtPath(imagePathURL: NSURL) throws -> NSImage {
-        guard let i = NSImage(contentsOfURL: imagePathURL) else {
-            throw Error.StringError("Loading original image failed")
+    func loadImageAtPath(imagePathURL: URL) throws -> NSImage {
+        guard let i = NSImage(contentsOf: imagePathURL) else {
+            throw IconMakerError.stringError("Loading original image failed")
         }
         return i
     }
     
-    func getIconJSONPath(iconFolderPath: NSURL) -> NSURL {
-        return iconFolderPath.URLByAppendingPathComponent("Contents.json")
+    func getIconJSONPath(iconFolderPath: URL) -> URL {
+        return iconFolderPath.appendingPathComponent("Contents.json")
     }
     
-    func getJSONDict(jsonDictPath: NSURL) throws -> NSDictionary {
-        guard let data = NSData(contentsOfURL: jsonDictPath) else {
-            throw Error.StringError("Loading icon JSON failed")
+    func getJSONDict(jsonDictPath: URL) throws -> NSDictionary {
+        guard let data = NSData(contentsOf: jsonDictPath) else {
+            throw IconMakerError.stringError("Loading icon JSON failed")
         }
-        guard let jsonDict = try? NSJSONSerialization.JSONObjectWithData(data, options: NSJSONReadingOptions.MutableContainers) as? NSDictionary else {
-            throw Error.StringError("Parsing icon JSON failed")
+        guard let jsonDict = try? JSONSerialization.jsonObject(with: data as Data, options: [.mutableContainers]) as? NSDictionary else {
+            throw IconMakerError.stringError("Parsing icon JSON failed")
         }
         return jsonDict!
     }
     
-    func resizeImage(img: NSImage, stringSize: String, stringScale: String, savePath: NSURL) throws -> String {
-        guard let size = Double(stringSize.componentsSeparatedByString("x").first!),
-            let scale = Double(stringScale.componentsSeparatedByString("x").first!) else {
-                throw Error.StringError("Error retrieving icon size or scale")
+    func resizeImage(img: NSImage, stringSize: String, stringScale: String, savePath: URL) throws -> String {
+        guard let size = Double(stringSize.components(separatedBy: "x").first!),
+            let scale = Double(stringScale.components(separatedBy: "x").first!) else {
+                throw IconMakerError.stringError("Error retrieving icon size or scale")
         }
         let resultSize = NSSize(width: size * scale, height: size * scale)
         img.size = resultSize
         _ = NSBitmapImageRep(focusedViewRect: NSRect(x: 0.0, y: 0.0, width: img.size.width, height: img.size.height))
-        let data = try dataFromImage(img, size: Int(size * scale))
+        let data = try dataFromImage(image: img, size: Int(size * scale))
         let imgName = "Icon-\(size)@\(stringScale).png"
-        guard data.writeToURL(savePath.URLByAppendingPathComponent(imgName), atomically: true) else {
-            throw Error.StringError("Error saving icon")
-        }
+        try! data.write(to: savePath.appendingPathComponent(imgName), options: [Data.WritingOptions.atomic])
+//        else {
+//            throw IconMakerError.stringError("Error saving icon")
+//        }
         return imgName
     }
     
-    func dataFromImage(image: NSImage, size: Int) throws -> NSData {
+    func dataFromImage(image: NSImage, size: Int) throws -> Data {
         if let representation = NSBitmapImageRep(bitmapDataPlanes: nil,
-            pixelsWide: size,
-            pixelsHigh: size,
-            bitsPerSample: 8,
-            samplesPerPixel: 4,
-            hasAlpha: true,
-            isPlanar: false,
-            colorSpaceName: NSCalibratedRGBColorSpace,
-            bytesPerRow: 0,
-            bitsPerPixel: 0) {
-                representation.size = NSSize(width: size, height: size)
-                NSGraphicsContext.saveGraphicsState()
-                NSGraphicsContext.setCurrentContext(NSGraphicsContext(bitmapImageRep: representation))
-                image.drawInRect(NSRect(x: 0, y: 0, width: size, height: size),
-                    fromRect: NSZeroRect,
-                    operation: NSCompositingOperation.CompositeCopy,
-                    fraction: 1.0)
-                NSGraphicsContext.restoreGraphicsState()
-                guard let imageData = representation.representationUsingType(NSBitmapImageFileType.NSPNGFileType, properties: [String : AnyObject]()) else {
-                    throw Error.StringError("Error obtaining data for icon image")
-                }
-                return imageData
+                                                 pixelsWide: size,
+                                                 pixelsHigh: size,
+                                                 bitsPerSample: 8,
+                                                 samplesPerPixel: 4,
+                                                 hasAlpha: true,
+                                                 isPlanar: false,
+                                                 colorSpaceName: NSCalibratedRGBColorSpace,
+                                                 bytesPerRow: 0,
+                                                 bitsPerPixel: 0) {
+            representation.size = NSSize(width: size, height: size)
+            NSGraphicsContext.saveGraphicsState()
+            NSGraphicsContext.setCurrent(NSGraphicsContext(bitmapImageRep: representation))
+            image.draw(in: NSRect(x: 0, y: 0, width: size, height: size),
+                       from: NSZeroRect,
+                       operation: NSCompositingOperation.copy,
+                       fraction: 1.0)
+            NSGraphicsContext.restoreGraphicsState()
+            guard let imageData = representation.representation(using: NSBitmapImageFileType.PNG, properties: [String : AnyObject]()) else {
+                throw IconMakerError.stringError("Error obtaining data for icon image")
+            }
+            return imageData
         } else {
-            throw Error.StringError("Error obtaining representation for icon image")
+            throw IconMakerError.stringError("Error obtaining representation for icon image")
         }
     }
     
-    func saveResultingIconJSON(jsonDict: NSDictionary, savePath: NSURL) throws {
+    func saveResultingIconJSON(jsonDict: NSDictionary, savePath: URL) throws {
         do {
-            let data = try NSJSONSerialization.dataWithJSONObject(jsonDict, options: NSJSONWritingOptions.PrettyPrinted)
-            guard data.writeToURL(savePath, atomically: true) else {
-                throw Error.StringError("Error saving icon JSON to disk")
+            let data = try JSONSerialization.data(withJSONObject: jsonDict, options: JSONSerialization.WritingOptions.prettyPrinted)
+            guard let _ = try? data.write(to: savePath) else {
+                throw IconMakerError.stringError("Error saving icon JSON to disk")
             }
-        } catch Error.StringError(description) {
-            throw Error.StringError(description)
+        } catch IconMakerError.stringError(description) {
+            throw IconMakerError.stringError(description)
         } catch _ {
-            throw Error.StringError("Error creating icon JSON")
+            throw IconMakerError.stringError("Error creating icon JSON")
         }
     }
 }
@@ -173,8 +174,8 @@ class IconMaker: NSObject {
 extension NSTableView {
     
     static func swizzleStuff() {
-        let originalSelector = Selector("menuForEvent:")
-        let swizzledSelector = Selector("im_menuForEvent:")
+        let originalSelector = #selector(NSView.menu(for:))
+        let swizzledSelector = #selector(im_menuForEvent)
         
         let originalMethod = class_getInstanceMethod(NSTableView.self, originalSelector)
         let swizzledMethod = class_getInstanceMethod(NSTableView.self, swizzledSelector)
@@ -187,35 +188,35 @@ extension NSTableView {
             method_exchangeImplementations(originalMethod, swizzledMethod);
         }
         
-        separatorMenuItem = NSMenuItem.separatorItem()
+        separatorMenuItem = NSMenuItem.separator()
         iconMenuItem = createIconMenuItem()
     }
     
     func im_menuForEvent(event: NSEvent) -> NSMenu {
-        let menu = im_menuForEvent(event)
-        if let si = separatorMenuItem, ii = iconMenuItem where menu.itemArray.contains(si) && menu.itemArray.contains(ii) {
+        let menu = im_menuForEvent(event: event)
+        if let si = separatorMenuItem, let ii = iconMenuItem , menu.items.contains(si) && menu.items.contains(ii) {
             menu.removeItem(si)
             menu.removeItem(ii)
         }
         if "IBICSourceListOutlineView" == self.className {
-            if let selectedItems = self.performSelector("selectedItems")?.takeUnretainedValue() as? NSArray,
-                let outlineViewItem = selectedItems.firstObject as? NSObject where "IBICOutlineViewItem" == outlineViewItem.className {
-                    if let catalogItem = outlineViewItem.performSelector("catalogItem").takeUnretainedValue() as? NSObject where catalogItem.className == "IBICAppIconSet" {
-                        if let url = catalogItem.performSelector("absoluteFileURL").takeUnretainedValue() as? NSURL,
-                            let smi = separatorMenuItem,
-                            let imi = iconMenuItem {
-                                iconSetURL = url
-                                menu.addItem(smi)
-                                menu.addItem(imi)
-                        }
+            if let selectedItems = self.perform(Selector(("selectedItems")))?.takeUnretainedValue() as? NSArray,
+                let outlineViewItem = selectedItems.firstObject as? NSObject , "IBICOutlineViewItem" == outlineViewItem.className {
+                if let catalogItem = outlineViewItem.perform(Selector(("catalogItem"))).takeUnretainedValue() as? NSObject , catalogItem.className == "IBICAppIconSet" {
+                    if let url = catalogItem.perform(Selector(("absoluteFileURL"))).takeUnretainedValue() as? URL,
+                        let smi = separatorMenuItem,
+                        let imi = iconMenuItem {
+                        iconSetURL = url
+                        menu.addItem(smi)
+                        menu.addItem(imi)
                     }
+                }
             }
         }
         return menu
     }
     
     static func createIconMenuItem() -> NSMenuItem {
-        let iconMenuIcon = NSMenuItem(title:"Make An App Icon", action:"doMenuAction", keyEquivalent:"")
+        let iconMenuIcon = NSMenuItem(title:"Make An App Icon", action:#selector(IconMaker.doMenuAction), keyEquivalent:"")
         iconMenuIcon.target = sharedPlugin
         return iconMenuIcon
     }
