@@ -176,7 +176,6 @@ extension NSTableView {
     static func swizzleStuff() {
         let originalSelector = #selector(NSView.menu(for:))
         let swizzledSelector = #selector(im_menuForEvent)
-        
         let originalMethod = class_getInstanceMethod(NSTableView.self, originalSelector)
         let swizzledMethod = class_getInstanceMethod(NSTableView.self, swizzledSelector)
         
