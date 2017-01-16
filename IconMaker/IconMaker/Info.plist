@@ -38,6 +38,7 @@
 		<string>E969541F-E6F9-4D25-8158-72DC3545A6C6</string>
 		<string>1637F4D5-0B27-416B-A78D-498965D64877</string>
 		<string>ACA8656B-FEA8-4B6D-8E4A-93F4C95C362C</string>
+		<string>E0A62D1F-3C18-4D74-BFE5-A4167D643966</string>
 	</array>
 	<key>LSMinimumSystemVersion</key>
 	<string>$(MACOSX_DEPLOYMENT_TARGET)</string>
